@@ -155,3 +155,15 @@ void MainWindow::on_pbZoneRLS_clicked()
     }
     delete dialogZoneRLS;
 }
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    ChooseAirplane *chooseAir = new ChooseAirplane(data, ENEMY);
+    if(chooseAir->exec() == QDialog::Accepted)
+    {
+        qDebug() << "accept";
+    } else {
+        qDebug() << "reject";
+    }
+    delete chooseAir;
+}

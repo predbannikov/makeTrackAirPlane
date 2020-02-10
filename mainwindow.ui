@@ -39,7 +39,7 @@
             <x>0</x>
             <y>0</y>
             <width>631</width>
-            <height>321</height>
+            <height>293</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_5"/>
@@ -63,10 +63,17 @@
        <string>Наши данные</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
+       <item row="1" column="0">
         <widget class="QPushButton" name="pbZoneRLS">
          <property name="text">
           <string>Выбрать зоны РЛС и точки облёта</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="text">
+          <string>Выбрать модель самолёта</string>
          </property>
         </widget>
        </item>

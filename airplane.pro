@@ -24,8 +24,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     calctrack.cpp \
+    chooseairplane.cpp \
     dialogzonerls.cpp \
-    inputdatadialog.cpp \
     main.cpp \
     mainwindow.cpp \
     mylabel.cpp \
@@ -33,9 +33,9 @@ SOURCES += \
 
 HEADERS += \
     calctrack.h \
+    chooseairplane.h \
     dialogzonerls.h \
     global.h \
-    inputdatadialog.h \
     mainwindow.h \
     mylabel.h \
     scribblearea.h

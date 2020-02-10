@@ -9,6 +9,7 @@
 #include "global.h"
 #include "scribblearea.h"
 #include "dialogzonerls.h"
+#include "chooseairplane.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -53,5 +54,6 @@ public slots:
 private slots:
     void on_pushButton_clicked();
     void on_pbZoneRLS_clicked();
+    void on_pushButton_2_clicked();
 };
 #endif // MAINWINDOW_H

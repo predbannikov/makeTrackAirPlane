@@ -456,23 +456,19 @@ void DialogZoneRLS::autoGenerateRLS()
     else
         pointBorder = data->pointBorderRussia;
 
-
+    int x, y, r;
     for(int i = 0; i < sbCountRLS->value(); i++) {
-        int x, y, r;
+        ZoneRLS rls;
         do {
-            QThread::msleep(15);
+            QThread::msleep(1);
             x = qrand() % data->image.width();
             y = qrand() % data->image.height();
             r = qrand() % 75 + 10;
-        }
-        while(!isPointInsidePolygon(pointBorder, x, y));
-        ZoneRLS rls;
-        rls.x = x;
-        rls.y = y;
-        rls.radius = r;
+            rls = {x, y, r};
+        } while(!checkPointRLS(rls));
         data->lastZoneRLS.append(rls);
-        qDebug() << x << y << r << "true RLS" << (m_side == ENEMY ? "enemy" : "russia");
     }
+    qDebug() << x << y << r << "true RLS" << (m_side == ENEMY ? "enemy" : "russia") ;
     setCmbRLS();
 }
 

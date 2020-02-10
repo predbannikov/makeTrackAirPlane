@@ -11,6 +11,12 @@
 
 enum SIDE {ENEMY, RUSSIA};
 
+struct Airplane {
+    QString model;
+    double speed;
+    double radiusTurn;
+};
+
 struct Coord {
     int x = 0;
     int y = 0;
@@ -31,6 +37,8 @@ struct Data {
     QVector<ZoneRLS> zoneRLS;
     QVector<QPoint> pointsFlight;
     QVector<QPoint> lastPointsFlight;
+    QVector<Airplane> airplanes;
+    QVector<Airplane> lastAirplane;
 };
 
 inline bool isPointInsideElypseRLS(QVector<ZoneRLS> a_vecRLS, int px, int py) {
