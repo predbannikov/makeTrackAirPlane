@@ -32,6 +32,8 @@ public:
 private:
 
     void loadDivision();
+    void initAirplanes();
+    void updateLabelInfo();
     ScribbleArea *scribbleArea;
     Ui::MainWindow *ui;
     QLabel *label;
@@ -47,6 +49,7 @@ private:
     QImage resultImg;
 //    QVector<ZoneRLS> vecZoneRLS;
     Data *data;
+
 public slots:
     void updatePix(QImage *img);
 
@@ -55,5 +58,7 @@ private slots:
     void on_pushButton_clicked();
     void on_pbZoneRLS_clicked();
     void on_pushButton_2_clicked();
+    void on_pushButton_3_clicked();
+    void on_pushButton_4_clicked();
 };
 #endif // MAINWINDOW_H

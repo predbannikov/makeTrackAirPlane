@@ -3,7 +3,7 @@
 #include "math.h"
 #include <QFile>
 
-bool isPointInsidePolygon (QVector<QPoint> p, int x, int y);
+//bool isPointInsidePolygon (QVector<QPoint> p, int x, int y);
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -11,11 +11,12 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    data = new Data;
+    initAirplanes();
 
     scribbleArea = new ScribbleArea();
     ui->groupBox_4->hide(); // убрать
     label = new QLabel;
-    data = new Data;
 
     QScrollArea *scroll = new QScrollArea;
     ui->groupBox_3->layout()->addWidget(scroll);
@@ -58,6 +59,28 @@ void MainWindow::loadDivision()
     QImage imgEnemy = scribbleArea->loadDivision(data->pointBorderEnemy);
     data->image = imgEnemy;
     label->setPixmap(QPixmap::fromImage(data->image));
+}
+
+void MainWindow::initAirplanes()
+{
+    data->airplanes.append({"СУ-27", 2500, 450});
+    data->airplanes.append({"МИГ-29", 2400, 550});
+    data->airplanes.append({"Як-130", 1600, 700});
+    data->airplanes.append({"ES-1", 1600, 700});
+    data->airplanes.append({"ES-2", 2000, 500});
+    data->airplanes.append({"ES-3", 1200, 300});
+    data->russiaAir = data->airplanes.at(0);
+    data->enemyAir = data->airplanes.at(3);
+    updateLabelInfo();
+}
+
+void MainWindow::updateLabelInfo()
+{
+    ui->labelInfo->setAlignment(Qt::AlignCenter);
+    ui->labelInfo->setText(QString("Россия: модель %1, скорость %2 км/ч, радиус поворота %3 м\n"
+                                   "Враг: модель %4, скорость %5 км/ч, радиус поворота %6 м")
+                           .arg(data->russiaAir.model).arg(data->russiaAir.speed).arg(data->russiaAir.radiusTurn)
+                           .arg(data->enemyAir.model).arg(data->enemyAir.speed).arg(data->enemyAir.radiusTurn));
 }
 
 QVector<QPoint> MainWindow::loadArrBorder(QString a_fileName)
@@ -141,14 +164,31 @@ void MainWindow::on_pushButton_clicked()
         generatePoint();
 }
 
-void MainWindow::on_pbZoneRLS_clicked()
+void MainWindow::on_pushButton_4_clicked()
 {
     DialogZoneRLS* dialogZoneRLS = new DialogZoneRLS(data, ENEMY);
     if (dialogZoneRLS->exec() == QDialog::Accepted)
     {
        qDebug() << "accept";
-       data->zoneRLS = data->lastZoneRLS;
-       data->pointsFlight = data->lastPointsFlight;
+       data->zoneRLSEnemy = data->lastZoneRLS;
+       data->pointsFlightEnemy = data->lastPointsFlight;
+       data->image = data->lastImage;
+       label->setPixmap(QPixmap::fromImage(data->lastImage));
+    } else {
+        qDebug() << "reject";
+    }
+    delete dialogZoneRLS;
+}
+
+void MainWindow::on_pbZoneRLS_clicked()
+{
+    DialogZoneRLS* dialogZoneRLS = new DialogZoneRLS(data, RUSSIA);
+    if (dialogZoneRLS->exec() == QDialog::Accepted)
+    {
+       qDebug() << "accept";
+       data->zoneRLSRussia = data->lastZoneRLS;
+       data->pointsFlightRussia = data->lastPointsFlight;
+       data->image = data->lastImage;
        label->setPixmap(QPixmap::fromImage(data->lastImage));
     } else {
         qDebug() << "reject";
@@ -158,12 +198,30 @@ void MainWindow::on_pbZoneRLS_clicked()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    ChooseAirplane *chooseAir = new ChooseAirplane(data, ENEMY);
+    ChooseAirplane *chooseAir = new ChooseAirplane(data, RUSSIA);
     if(chooseAir->exec() == QDialog::Accepted)
     {
         qDebug() << "accept";
+        data->russiaAir = data->lastRussiaAir;
+        updateLabelInfo();
     } else {
         qDebug() << "reject";
     }
     delete chooseAir;
 }
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    ChooseAirplane *chooseAir = new ChooseAirplane(data, ENEMY);
+    if(chooseAir->exec() == QDialog::Accepted)
+    {
+        qDebug() << "accept";
+        data->enemyAir = data->lastEnemyAir;
+        updateLabelInfo();
+    } else {
+        qDebug() << "reject";
+    }
+    delete chooseAir;
+}
+
+

@@ -1,12 +1,15 @@
 #include "dialogzonerls.h"
 
+#define MAXIMUM_RLS     15
+#define MAXIMUM_FLIGHT  15
+
 
 DialogZoneRLS::DialogZoneRLS(Data *a_data, SIDE a_side)
 {
     m_side = a_side;
     data = a_data;
-    data->lastZoneRLS = data->zoneRLS;
-    data->lastPointsFlight = data->pointsFlight;
+    data->lastZoneRLS = data->zoneRLSRussia;
+    data->lastPointsFlight = data->pointsFlightRussia;
     data->lastImage = data->image;
 
     QGridLayout* ptopLayout = new QGridLayout;
@@ -174,7 +177,7 @@ DialogZoneRLS::DialogZoneRLS(Data *a_data, SIDE a_side)
     QLabel *lbCountRLS = new QLabel("Кол-во зон РЛС");
     QLabel *lbCountRLSsuf = new QLabel("(шт)");
     sbCountRLS = new QSpinBox;
-    sbCountRLS->setMaximum(30);
+    sbCountRLS->setMaximum(MAXIMUM_RLS);
     sbCountRLS->setMinimum(1);
     sbCountRLS->setValue(4);
     connect(sbCountRLS, qOverload<int>(&QSpinBox::valueChanged), [this](int value) {
@@ -198,7 +201,7 @@ DialogZoneRLS::DialogZoneRLS(Data *a_data, SIDE a_side)
     QLabel *lbCountFlight = new QLabel("Кол-во точек облёта");
     QLabel *lbCountFlightsuf = new QLabel("(шт)");
     sbCountPointsFlight = new QSpinBox;
-    sbCountPointsFlight->setMaximum(30);
+    sbCountPointsFlight->setMaximum(MAXIMUM_FLIGHT);
     sbCountPointsFlight->setMinimum(1);
     sbCountPointsFlight->setValue(5);
     connect(sbCountPointsFlight, qOverload<int>(&QSpinBox::valueChanged), [this](int value) {
