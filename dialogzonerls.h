@@ -5,7 +5,9 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QDateTime>
+#include <QShowEvent>
 #include <QThread>
+#include <QTimer>
 #include <QLabel>
 #include <QGridLayout>
 #include <QScrollArea>
@@ -25,6 +27,7 @@ public:
     Data *data;
 private:
     SIDE m_side;
+    QPushButton* pcmdOk;
     QSpinBox *sbCountRLS;
     QSpinBox *sbCountPointsFlight;
     QSpinBox *sbXCoordRLS;
@@ -41,6 +44,7 @@ private:
     void setCmbFlight();
     bool checkPointRLS(ZoneRLS a_rls);
     bool checkPointFlight(QPoint a_point);
+    void testFunc();
 private slots:
     void acceptButton();
     void autoGenerateRLS();

@@ -10,6 +10,7 @@
 #include "scribblearea.h"
 #include "dialogzonerls.h"
 #include "chooseairplane.h"
+#include "calctrack.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -17,9 +18,6 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 class ScribbleArea;
-
-
-
 
 class MainWindow : public QMainWindow
 {
@@ -45,6 +43,8 @@ private:
     void keyReleaseEvent(QKeyEvent *event) override;
     void setPoint(int x, int y);
     void generatePoint();
+    void setPoints(QVector <QPoint> *points);
+    void setLines();
 //    QImage sourceImg;
     QImage resultImg;
 //    QVector<ZoneRLS> vecZoneRLS;

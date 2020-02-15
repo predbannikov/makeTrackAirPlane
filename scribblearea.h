@@ -65,8 +65,8 @@ class ScribbleArea : public QLabel
     Q_OBJECT
 
 public:
-    ScribbleArea(QWidget *parent = nullptr);
-
+    ScribbleArea(QWidget *parent = nullptr, Data *a_data = NULL);
+    Data *data;
     bool openImage(QImage &imageMap);
     void setPenColor(const QColor &newColor);
     void setPenWidth(int newWidth);
@@ -76,6 +76,9 @@ public:
     int penWidth() const { return myPenWidth; }
     void setCoord(Coord *cd);
     QImage setPoint(QString a_str, int x, int y, int a_widthPen = 10, QColor a_color = QColor(0, 0, 255));
+    QImage setPoints(QVector<QPoint> *points, int a_widthPen = 4, QColor a_color = QColor(0, 0, 255));
+    QImage setLines(int a_widthPen = 3, QColor a_color = QColor(0, 0, 255));
+
     Coord *coord;
 
 public slots:

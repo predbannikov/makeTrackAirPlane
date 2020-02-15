@@ -8,9 +8,15 @@ DialogZoneRLS::DialogZoneRLS(Data *a_data, SIDE a_side)
 {
     m_side = a_side;
     data = a_data;
-    data->lastZoneRLS = data->zoneRLSRussia;
-    data->lastPointsFlight = data->pointsFlightRussia;
     data->lastImage = data->image;
+
+    if(m_side == ENEMY) {
+        data->lastPointsFlight = data->pointsFlightEnemy;
+        data->lastZoneRLS = data->zoneRLSEnemy;
+    } else {
+        data->lastZoneRLS = data->zoneRLSRussia;
+        data->lastPointsFlight = data->pointsFlightRussia;
+    }
 
     QGridLayout* ptopLayout = new QGridLayout;
 
@@ -163,7 +169,7 @@ DialogZoneRLS::DialogZoneRLS(Data *a_data, SIDE a_side)
     // ---------------------------------------
 
 
-    QPushButton* pcmdOk     = new QPushButton("&Ok");
+    pcmdOk     = new QPushButton("&Ok");
     QPushButton* pcmdCancel = new QPushButton("&Cancel");
 
     // --------------------------------------- RLS
@@ -309,6 +315,7 @@ DialogZoneRLS::DialogZoneRLS(Data *a_data, SIDE a_side)
     setCmbRLS();
     setCmbFlight();
 
+    testFunc();
 }
 
 QImage DialogZoneRLS::setPointRLS(QString a_str, int x, int y, int r, int a_widthPen, QColor a_color)
@@ -442,6 +449,12 @@ bool DialogZoneRLS::checkPointFlight(QPoint a_point)
     }
 }
 
+void DialogZoneRLS::testFunc()
+{
+    autoGenerateRLS();
+    QTimer::singleShot(100, this, &DialogZoneRLS::acceptButton);
+}
+
 void DialogZoneRLS::acceptButton()
 {
     setDataPointsRLS();
@@ -452,7 +465,8 @@ void DialogZoneRLS::acceptButton()
 void DialogZoneRLS::autoGenerateRLS()
 {
     data->lastZoneRLS.clear();
-    qsrand(QDateTime::currentMSecsSinceEpoch());
+    qsrand(2000);
+//    qsrand(QDateTime::currentMSecsSinceEpoch());
     QVector<QPoint> pointBorder;
     if(m_side == ENEMY)
         pointBorder = data->pointBorderEnemy;

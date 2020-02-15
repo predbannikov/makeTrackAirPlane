@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     data = new Data;
     initAirplanes();
 
-    scribbleArea = new ScribbleArea();
+    scribbleArea = new ScribbleArea(this, data);
     ui->groupBox_4->hide(); // убрать
     label = new QLabel;
 
@@ -37,6 +37,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     loadDivision();
     this->setGeometry(0, 0, 1366, 600);
+    // При отладке точки задать
+//    on_pushButton_clicked();
+    data->pointsFlightEnemy.append(QPoint(420, 273));
+    data->pointsFlightEnemy.append(QPoint(750, 234));
+    for(int i = 0; i < 2; i++) {
+        setPoint(data->pointsFlightEnemy[i].x(), data->pointsFlightEnemy[i].y());
+    }
+    on_pushButton_4_clicked();
+
+    CalcTrack track(data, ENEMY);
+    setPoints(track.getPoints());
+    setLines();
 }
 
 MainWindow::~MainWindow()
@@ -156,11 +168,25 @@ void MainWindow::generatePoint()
 
 }
 
+void MainWindow::setPoints(QVector<QPoint> *points)
+{
+    scribbleArea->openImage(data->lastImage);
+    data->image = scribbleArea->setPoints(points);
+    scribbleArea->openImage(data->image);
+    label->setPixmap(QPixmap::fromImage(data->image));
+}
 
+void MainWindow::setLines()
+{
+    scribbleArea->openImage(data->lastImage);
+    data->image = scribbleArea->setLines(1, QColor(0, 0, 255));
+    scribbleArea->openImage(data->image);
+    label->setPixmap(QPixmap::fromImage(data->image));
+}
 
 void MainWindow::on_pushButton_clicked()
 {
-    for(int i = 0; i < 30; i++)
+    for(int i = 0; i < 2; i++)
         generatePoint();
 }
 

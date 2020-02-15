@@ -11,6 +11,16 @@
 
 enum SIDE {ENEMY, RUSSIA};
 
+struct Edge {
+    int a, b;       // номера индексов рёбер
+    double cost;    // расстояние между рёбрами
+};
+struct UT {
+    double x;
+    double y;
+    bool check;
+};
+
 struct Airplane {
     QString model;
     int speed;
@@ -44,8 +54,13 @@ struct Data {
     Airplane lastRussiaAir;
     Airplane enemyAir;
     Airplane russiaAir;
-};
+    QVector <QVector<UT> > *mat;
+    QVector <UT> *arr_points;
+    QVector <Edge> *edge_arr;
 
+
+};
+// возвращает true если внутри элипса
 inline bool isPointInsideElypseRLS(QVector<ZoneRLS> a_vecRLS, int px, int py) {
     for(int i = 0; i < a_vecRLS.size(); i++) {
         if(pow(px - a_vecRLS.at(i).x, 2) +
