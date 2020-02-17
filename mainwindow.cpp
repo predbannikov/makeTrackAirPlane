@@ -14,6 +14,14 @@ MainWindow::MainWindow(QWidget *parent)
     data = new Data;
     initAirplanes();
 
+    data->vec_points = new QVector <QVector<UT> >;
+    data->vec_edge = new QVector <QVector<Edge> >;
+    data->vec_path = new QVector <QVector<UT> >;
+    data->vec_pathSmooth = new QVector <QVector<UT> >;
+    data->vec_meshPoints = new QVector <QVector<QPoint> >;
+    data->vec_edge_check = new QVector <QVector<Edge> >;
+
+
     scribbleArea = new ScribbleArea(this, data);
     ui->groupBox_4->hide(); // убрать
     label = new QLabel;
@@ -39,20 +47,45 @@ MainWindow::MainWindow(QWidget *parent)
     this->setGeometry(0, 0, 1366, 600);
     // При отладке точки задать
 //    on_pushButton_clicked();
+    data->pointsFlightEnemy.append(QPoint(410, 253));
     data->pointsFlightEnemy.append(QPoint(755, 214));
-    data->pointsFlightEnemy.append(QPoint(510, 253));
     for(int i = 0; i < 2; i++) {
         setPoint(data->pointsFlightEnemy[i].x(), data->pointsFlightEnemy[i].y());
     }
     on_pushButton_4_clicked();
 
     CalcTrack track(data);
-    setPoints(track.getPoints());
-    setLines(data->edge_arr, data->arr_points, 1, QColor(0, 0, 255));
-    setLinesOnPoint(data->path, 2, QColor(190, 100, 0));
-//    setLines(data->checkEdge, data->path, 1, QColor(100, 100, 100));
-//    setLinesOnPointSmooth(data->pathSmoothing, 2, QColor(255, 0, 0));
-    setLinesOnPoint(data->pathSmoothing, 2, QColor(255, 0, 0));
+    track.calcTrack(ENEMY, RIGHT);
+    for(int i = 0; i < data->vec_meshPoints->size(); i++) {                                // Точки самой первой сетки
+        QVector <QPoint> vec = data->vec_meshPoints->at(i);
+        setPoints(&vec);
+    }
+
+    for(int i = 0; i < data->vec_edge->size(); i++) {                                // Лини самой первой сетки
+        QVector<Edge> vec = data->vec_edge->at(i);
+        QVector <UT> vec_points = data->vec_points->at(i);
+        setLines(&vec, &vec_points, 1, QColor(0, 0, 255));
+    }
+
+    for(int i = 0; i < data->vec_edge_check->size(); i++) {                                // Все пути в сетке
+        QVector<Edge> vec = data->vec_edge_check->at(i);
+        QVector<UT> vec_ut = data->vec_path->at(i);
+        setLines(&vec, &vec_ut, 2, QColor(190, 100, 0));
+    }
+
+    for(int i = 0; i < data->vec_pathSmooth->size(); i++) {                 // Сглаженный путь
+        qDebug() << "path" << i << "=" << data->lengthPath.at(i);
+        QVector<UT> vec = data->vec_pathSmooth->at(i);
+        setLinesOnPoint(&vec, 2, QColor(255, 0, 0));
+    }
+//        setPoints(track.getPoints());
+//        setLines(data->edge_arr, data->arr_points, 1, QColor(0, 0, 255));
+//        setLinesOnPoint(data->path, 2, QColor(190, 100, 0));
+//        setLines(data->checkEdge, data->path, 1, QColor(100, 100, 100));
+        //    setLinesOnPointSmooth(data->pathSmoothing, 2, QColor(255, 0, 0));
+//        setLinesOnPoint(data->pathSmoothing, 2, QColor(255, 0, 0));
+
+//    }
 }
 
 MainWindow::~MainWindow()

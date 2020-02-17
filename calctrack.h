@@ -12,7 +12,7 @@ class CalcTrack
 public:
     CalcTrack(Data *a_data);
     QVector<QPoint> *getPoints();
-    void calcTrack();
+    void calcTrack(SIDE a_side, SEARCH_SIDE a_search_side);
 private:
     int number_need_vert;
     double Ls;
@@ -20,17 +20,16 @@ private:
     int min_y;
     int max_x;
     int max_y;
+    void edgeAppend(Edge ed);
     void calcMinMax();
     void setEdge();
     void setEdgeOnPath();
     bool checkEdge(Edge ed);
     QVector<double> calcPath(int number_vert);
     QVector<double> smoothingPath();
-    QVector<int> *path;
-    QVector<Edge> *pathEdge;
-    QVector <QPoint> *points;
-    QVector <Edge> *edge_arr;
-    QVector <UT> *arr_points;
+
+    double lengthPath = 0;
+
     QVector <UT> mat_line;
     QVector <QVector<UT> > mat;
     Data *data;

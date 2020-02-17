@@ -5,21 +5,24 @@
 CalcTrack::CalcTrack(Data *a_data)
 {
     data = a_data;
-    calcMinMax();
-    path = new QVector<int>;
+//    calcMinMax();
+//    path = new QVector<int>;
+    data->indexPath = new QVector<int>;
+    data->indexPathSmooth = new QVector<int>;
     data->path = new QVector<UT>;
     data->pathSmoothing = new QVector<UT>;
-    points = new QVector<QPoint>;
-    arr_points = new QVector <UT>;
-    edge_arr = new QVector <Edge>;
-    pathEdge = new QVector<Edge>;
+    data->meshPoints = new QVector <QPoint>;
+    data->arr_points = new QVector<UT>;
+    data->edge_arr = new QVector <Edge>;
+    data->checkEdge = new QVector <Edge>;
+//    pathEdge = new QVector<Edge>;
     data->arr_points_check = new QVector<UT>;
-    SEARCH_SIDE search_side = RIGHT;
+//    SEARCH_SIDE search_side = RIGHT;
 
-    QPoint p1 = data->pointsFlightEnemy[0];
+/*    QPoint p1 = data->pointsFlightEnemy[0];
     QPoint p2 = data->pointsFlightEnemy[1];
 
-    Ls = data->enemyAir.radiusTurn * 2. / 100.;  // '-[Ширина стороны квадрата сетки (два средних радиуса разворота)
+    Ls = data->enemyAir.radiusTurn * 2. / 70.;  // '-[Ширина стороны квадрата сетки (два средних радиуса разворота)
     double Lp = sqrt(pow((p2.x() - p1.x()), 2) + pow((p2.y() - p1.y()), 2));   // '-[Lp - длина полосы
     double widthCell = ((p2.x() - p1.x()) / Lp) * Ls;
     double hightCell = ((p2.y() - p1.y()) / Lp) * Ls;
@@ -32,17 +35,17 @@ CalcTrack::CalcTrack(Data *a_data)
         double appendix_g = Lp - (right_border * Ls);
         double appendix_width = appendix_g * angleCos;
         double appendix_hight = appendix_g * angleSin;
+        int index_number = -1;
         for(int i = 0; i < right_border; i++) {
             QPoint point;
             QVector <UT> line_ut;
-            for(int j = 0; j <= right_border; j++) {
-
-                double x = p1.x() + widthCell * j + hightCell * i;
-                double y = p1.y() + -widthCell * i + hightCell * j;
-//                double x = p1.x() + widthCell * j + -hightCell * i;
-//                double y = p1.y() + widthCell * i + hightCell * j;
-//                x *= -1.;
-//                y *= -1.;
+            int j = 0;
+            for(j = 0; j <= right_border; j++) {
+                index_number++;
+//                double x = p1.x() + widthCell * j + hightCell * i;
+//                double y = p1.y() + -widthCell * i + hightCell * j;
+                double x = p1.x() + widthCell * j + -hightCell * i;
+                double y = p1.y() + widthCell * i + hightCell * j;
                 if(!isPointInsideElypseRLS(data->zoneRLSEnemy, x, y)) {
                     qDebug() << "this point not inside elypse" ;
                     point.setX(x);
@@ -65,15 +68,19 @@ CalcTrack::CalcTrack(Data *a_data)
                         line_ut.append({x_appendix, y_appendix, false});
                     }
                 }
+                data->indexes.insert(index_number, QPoint(j, i));
             }
             if(i == (right_border - 1) )           // *******************  перед переходом на следующую строку
             {
+                index_number++;
 //                if(i == 0) {
 //                    points->append(p2);
 //                    line_ut.append({(double)p2.x(), (double)p2.y(), true});
 //                } else {
 //                    points->append(p2);
                     line_ut.append({(double)p2.x(), (double)p2.y(), false});
+                    data->indexes.insert(index_number, QPoint(j+1, i));
+
 //                }
             }
             mat.append(line_ut);
@@ -87,12 +94,13 @@ CalcTrack::CalcTrack(Data *a_data)
     calcPath(number_need_vert);
     setEdgeOnPath();        // <--
     smoothingPath();
+    */
 }
 QVector<double> CalcTrack::calcPath(int number_vert) {
     const int INF = 1000000000;
     int n, m, v;
-    n = arr_points->size();
-    m = edge_arr->size();
+    n = data->arr_points->size();
+    m = data->edge_arr->size();
     QVector<double> d (n, INF);
 
     v = 0;
@@ -102,11 +110,11 @@ QVector<double> CalcTrack::calcPath(int number_vert) {
     for (;;) {
         bool any = false;
         for (int j=0; j<m; ++j)
-            if (d[edge_arr->at(j).a] < INF)
-                if (d[edge_arr->at(j).b] > d[edge_arr->at(j).a] + edge_arr->at(j).cost &&
+            if (d[data->edge_arr->at(j).a] < INF)
+                if (d[data->edge_arr->at(j).b] > d[data->edge_arr->at(j).a] + data->edge_arr->at(j).cost &&
                         !qFuzzyCompare(d[data->edge_arr->at(j).b], d[data->edge_arr->at(j).a] + data->edge_arr->at(j).cost)) {
-                    d[edge_arr->at(j).b] = d[edge_arr->at(j).a] + edge_arr->at(j).cost;
-                    p->replace(edge_arr->at(j).b, edge_arr->at(j).a);
+                    d[data->edge_arr->at(j).b] = d[data->edge_arr->at(j).a] + data->edge_arr->at(j).cost;
+                    p->replace(data->edge_arr->at(j).b, data->edge_arr->at(j).a);
                     any = true;
                 }
         if(!any)
@@ -116,15 +124,19 @@ QVector<double> CalcTrack::calcPath(int number_vert) {
     if (d[t] == INF)
         qDebug() << "No path from " << v << " to " << t << ".";
     else {
-        for (int cur=t; cur!=-1; cur=p->at(cur))
-            path->push_back (cur);
-        std::reverse (path->begin(), path->end());
+//        QVector<int> *path = new QVector<int>;
+        data->indexPath->clear();
 
-        qDebug() << "Path from " << v << " to " << t << ": ";
-        for (int i=0; i<path->size(); ++i)
-            qDebug() << path->at(i) << ' ';
-        for(int i = 0; i < path->size(); i++) {
-            data->path->append(arr_points->at(path->at(i)));
+        for (int cur=t; cur!=-1; cur=p->at(cur))
+            data->indexPath->push_back (cur);
+        std::reverse (data->indexPath->begin(), data->indexPath->end());
+
+        qDebug() << "Path from " << v << " to " << t << ": " << data->indexPath->size();
+//        for (int i=0; i<path->size(); ++i)
+//            qDebug() << path->at(i) << ' ';
+        for(int i = 0; i < data->indexPath->size(); i++) {
+            data->path->append(data->arr_points->at(data->indexPath->at(i)));
+            data->indexes_smooth.insert(i, data->indexes.value(data->indexPath->at(i)));
         }
     }
     return d;
@@ -159,16 +171,19 @@ QVector<double> CalcTrack::smoothingPath()
     if (d[t] == INF)
         qDebug() << "No path from " << v << " to " << t << ".";
     else {
-        QVector<int> pathSmuthInt ;
+        data->indexPathSmooth->clear();
         for (int cur=t; cur!=-1; cur=p->at(cur))
-            pathSmuthInt.push_back (cur);
-        std::reverse (pathSmuthInt.begin(), pathSmuthInt.end());
-
-        qDebug() << "pathSmuthInt from " << v << " to " << t << ": ";
-        for (int i=0; i<pathSmuthInt.size(); ++i)
-            qDebug() << pathSmuthInt.at(i) << ' ';
-        for(int i = 0; i < pathSmuthInt.size(); i++) {
-            data->pathSmoothing->append(data->path->at(pathSmuthInt.at(i)));
+            data->indexPathSmooth->push_back (cur);
+        std::reverse (data->indexPathSmooth->begin(), data->indexPathSmooth->end());
+        for(int i = 0; i < data->indexPathSmooth->size(); i++)
+            lengthPath += d[data->indexPathSmooth->at(i)];
+        data->lengthPath.append(lengthPath);
+        qDebug() << "pathSmuthInt from " << v << " to " << t << ": " << " length =" << lengthPath;
+        lengthPath = 0;
+//        for (int i=0; i<data->indexPathSmooth->size(); ++i)
+//            qDebug() << data->indexPathSmooth->at(i) << ' ';
+        for(int i = 0; i < data->indexPathSmooth->size(); i++) {
+            data->pathSmoothing->append(data->path->at(data->indexPathSmooth->at(i)));
         }
     }
     qDebug() << "smoothingPath::stop";
@@ -182,7 +197,7 @@ void CalcTrack::setEdge() {
     int width = mat.first().size();
     for(int j = 0; j < mat.size(); j++) {
         for(int i = 0; i < mat.first().size(); i++) {
-            arr_points->append(mat[j][i]);
+            data->arr_points->append(mat[j][i]);
             Edge ed;
             ed.cost = Ls;
             if(i - 1 >= 0 && mat[j][i].check) {            // Лево
@@ -190,7 +205,8 @@ void CalcTrack::setEdge() {
                 ed.b = j * width + i;
                 if(mat[j][i - 1].check)
                     if(!checkEdge(ed))
-                        edge_arr->append(ed);
+                        edgeAppend(ed);
+//                        edge_arr->append(ed);
             }
 
             if(j - 1 >= 0 && mat[j][i].check) {            // Верх
@@ -198,30 +214,34 @@ void CalcTrack::setEdge() {
                 ed.b = j * width + i;
                 if(mat[j - 1][i].check)
                     if(!checkEdge(ed))
-                        edge_arr->append(ed);
+                        edgeAppend(ed);
+//                        edge_arr->append(ed);
             }
             if(i + 1 < mat.first().size() && mat[j][i].check) {         // Право
                 ed.a = (width * j) + i;
                 ed.b = (width * j) + i + 1;
                 if(mat[j][i + 1].check)
                     if(!checkEdge(ed))
-                        edge_arr->append(ed);
+                        edgeAppend(ed);
+//                        edge_arr->append(ed);
             }
             if(j + 1 < mat.size() && mat[j][i].check) {                // Низ
                 ed.a = width * j + i;
                 ed.b = (width * (j + 1)) + i;
                 if(mat[j + 1][i].check)
                     if(!checkEdge(ed))
-                        edge_arr->append(ed);
+                        edgeAppend(ed);
+//                        edge_arr->append(ed);
             }
 //            index++;
         }
     }
 
-    int siz_graph = edge_arr->size();
+    int siz_graph = data->edge_arr->size();
     for(int i = 0; i < siz_graph; i++) {
-        Edge ed = {edge_arr->at(i).b, edge_arr->at(i).a, edge_arr->at(i).cost};
-        edge_arr->append(ed);
+        Edge ed = {data->edge_arr->at(i).b, data->edge_arr->at(i).a, data->edge_arr->at(i).cost};
+        edgeAppend(ed);
+//        edge_arr->append(ed);
     }
 //    number_need_vert = width;
 //    data->arr_points = arr_points;
@@ -234,13 +254,22 @@ void CalcTrack::setEdge() {
 
 void CalcTrack::setEdgeOnPath()
 {
-    pathEdge->clear();
+    data->checkEdge->clear();
     int count_tick = 0;
-    for(int i = 0; i < path->size() - 1; i++) {
-        for(int j = i + 1; j < path->size(); j++) {
+    for(int i = 0; i < data->indexPath->size() - 1; i++) {
+        for(int j = i + 1; j < data->indexPath->size(); j++) {
 
-            QPointF p1 = {arr_points->at(path->at(i)).x, arr_points->at(path->at(i)).y};
-            QPointF p2 = {arr_points->at(path->at(j)).x, arr_points->at(path->at(j)).y};
+//            if(data->indexes_smooth.value(path->at(i)).x() == data->indexes_smooth.value(path->at(j)).x() ||
+//                    data->indexes_smooth.value(path->at(i)).y() == data->indexes_smooth.value(path->at(j)).y()) {
+//                qDebug() << "skip " << data->indexes_smooth.value(path->at(i)).x()
+//                         << data->indexes_smooth.value(path->at(j)).x()
+//                         << data->indexes_smooth.value(path->at(i)).y()
+//                         << data->indexes_smooth.value(path->at(j)).y();
+//                continue;
+//            }
+
+            QPointF p1 = {data->arr_points->at(data->indexPath->at(i)).x, data->arr_points->at(data->indexPath->at(i)).y};
+            QPointF p2 = {data->arr_points->at(data->indexPath->at(j)).x, data->arr_points->at(data->indexPath->at(j)).y};
 
             Edge ed{i, j, sqrt(pow(p2.x() - p1.x(), 2.) + pow(p2.y() - p1.y(), 2.))};
             double widthCell = ((p2.x() - p1.x()) / ed.cost) * Ls;
@@ -260,13 +289,13 @@ void CalcTrack::setEdgeOnPath()
                 break;
             else {
 //                qDebug() << "ed =" << ed.a << ed.b << ed.cost;
-                pathEdge->append(ed);
+                data->checkEdge->append(ed);
             }
         }
     }
 //    qDebug() << count_tick << pathEdge->size();
 //    qDebug() << "stop";
-    data->checkEdge = pathEdge;
+//    data->checkEdge = data->ch;
 }
 
 bool CalcTrack::checkEdge(Edge ed)
@@ -275,20 +304,147 @@ bool CalcTrack::checkEdge(Edge ed)
 //        qDebug() << "stop";
 //    if(ed.a >= 576)
 //        qDebug() << "stop";
-    for(int i = 0; i < edge_arr->size(); i++)
-        if(ed.a == edge_arr->at(i).a && ed.b == edge_arr->at(i).b)
+    for(int i = 0; i < data->edge_arr->size(); i++)
+        if(ed.a == data->edge_arr->at(i).a && ed.b == data->edge_arr->at(i).b)
             return true;
     return false;
 }
 
 QVector<QPoint> *CalcTrack::getPoints()
 {
-    return points;
+    return data->meshPoints;
 }
 
-void CalcTrack::calcTrack()
+void CalcTrack::calcTrack(SIDE a_side, SEARCH_SIDE a_search_side)
 {
-    SIDE a_side;
+    side = a_side;
+    SEARCH_SIDE search_side = RIGHT;
+
+    QPoint p1 = data->pointsFlightEnemy[0];
+    QPoint p2 = data->pointsFlightEnemy[1];
+
+
+    for(int c = 0; c < 2; c++) {
+        mat.clear();
+        data->arr_points->clear();
+        data->edge_arr->clear();
+        data->path->clear();
+        data->checkEdge->clear();
+        data->pathSmoothing->clear();
+
+        Ls = data->enemyAir.radiusTurn * 2. / 70.;  // '-[Ширина стороны квадрата сетки (два средних радиуса разворота)
+        double Lp = sqrt(pow((p2.x() - p1.x()), 2) + pow((p2.y() - p1.y()), 2));   // '-[Lp - длина полосы
+        double widthCell = ((p2.x() - p1.x()) / Lp) * Ls;
+        double hightCell = ((p2.y() - p1.y()) / Lp) * Ls;
+        double angleCos = (p2.x() - p1.x()) / Lp;      // Косинус угла
+        double angleSin = (p2.y() - p1.y()) / Lp;      // Синус угла
+        qDebug() << hightCell << widthCell << Ls << Lp;
+        if(Lp / Ls > 3) {
+            int right_border = Lp / Ls;
+
+            double appendix_g = Lp - (right_border * Ls);
+            double appendix_width = appendix_g * angleCos;
+            double appendix_hight = appendix_g * angleSin;
+            int index_number = -1;
+            for(int i = 0; i < right_border; i++) {
+                QPoint point;
+                QVector <UT> line_ut;
+                int j = 0;
+                for(j = 0; j <= right_border; j++) {
+                    index_number++;
+                    double x;
+                    double y;
+                    if(c == 1) {
+                        x = p1.x() + widthCell * j + hightCell * i;
+                        y = p1.y() + -widthCell * i + hightCell * j;
+                    } else {
+                        x = p1.x() + widthCell * j + -hightCell * i;
+                        y = p1.y() + widthCell * i + hightCell * j;
+                    }
+                    if(!isPointInsideElypseRLS(data->zoneRLSEnemy, x, y)) {
+                        qDebug() << "this point not inside elypse" ;
+                        point.setX(x);
+                        point.setY(y);
+                        data->meshPoints->append(point);
+                        line_ut.append({x, y, true});
+                    } else {
+                        line_ut.append({x, y, false});
+                    }
+                    qDebug() << Lp / widthCell << "i=" << i << " j=" << j;
+                    if(j == (right_border) && search_side == RIGHT)           // *******************  перед переходом на следующую строку
+                    {
+                        if(i == 0) {
+                            data->meshPoints->append(p2);
+                            line_ut.append({(double)p2.x(), (double)p2.y(), true});
+                        } else {
+                            double x_appendix = x + appendix_width * (j + 1) + -appendix_hight * i;
+                            double y_appendix = y + p1.y() + appendix_width * i + appendix_hight * (j + 1);
+                            data->meshPoints->append(QPoint(x_appendix, y_appendix));
+                            line_ut.append({x_appendix, y_appendix, false});
+                        }
+                    }
+                    data->indexes.insert(index_number, QPoint(j, i));
+                }
+                if(i == (right_border - 1) )           // *******************  перед переходом на следующую строку
+                {
+                    index_number++;
+    //                if(i == 0) {
+    //                    points->append(p2);
+    //                    line_ut.append({(double)p2.x(), (double)p2.y(), true});
+    //                } else {
+    //                    points->append(p2);
+                        line_ut.append({(double)p2.x(), (double)p2.y(), false});
+                        data->indexes.insert(index_number, QPoint(j+1, i));
+
+    //                }
+                }
+                mat.append(line_ut);
+            }
+            setEdge();
+        }
+
+        number_need_vert = mat.first().size();
+        calcPath(number_need_vert);
+        setEdgeOnPath();        // <--
+        smoothingPath();
+
+        // mesh points (QPoint)
+        QVector<QPoint> tmp_mesh = *data->meshPoints;
+        data->vec_meshPoints->append(tmp_mesh);
+        data->meshPoints->clear();
+
+        // points UT
+        QVector <UT> tmp_points = *data->arr_points;
+        data->vec_points->append(tmp_points);
+        data->arr_points->clear();
+
+        // Edge array source UT
+        QVector <Edge> tmp_edge = *data->edge_arr;
+        data->vec_edge->append(tmp_edge);
+        data->edge_arr->clear();
+
+
+        // Edge array path check UT
+        QVector <Edge> tmp_edgeCheck = *data->checkEdge;
+        data->vec_edge_check->append(tmp_edgeCheck);
+        data->checkEdge->clear();
+
+        QVector <UT> tmp_path = *data->path;
+        data->vec_path->append(tmp_path);
+        data->path->clear();
+
+        // array UT path smooth
+        QVector <UT> tmp_path_smooth = *data->pathSmoothing;
+        data->vec_pathSmooth->append(tmp_path_smooth);
+        data->pathSmoothing->clear();
+    }
+
+
+}
+
+void CalcTrack::edgeAppend(Edge ed)
+{
+    data->edge_arr->append(ed);
 }
 
 void CalcTrack::calcMinMax()

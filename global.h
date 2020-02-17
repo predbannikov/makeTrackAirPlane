@@ -21,6 +21,11 @@ struct UT {
     bool check;
 };
 
+struct LengthPathIndex {
+    int i;
+    double length;
+};
+
 struct Airplane {
     QString model;
     int speed;
@@ -54,14 +59,25 @@ struct Data {
     Airplane lastRussiaAir;
     Airplane enemyAir;
     Airplane russiaAir;
-    QVector <QVector<UT> > *mat;
+//    QVector <QVector<UT> > *mat;
     QVector <UT> *arr_points;               // Массив координат по индексам (номера точек)
     QVector <UT> *arr_points_check;         // Массив координат по для проверки
-    QVector <Edge> *edge_arr;
+    QVector <QPoint> *meshPoints;
+    QVector <int> *indexPath;
+    QVector <int> *indexPathSmooth;
     QVector<UT> *path;
     QVector<UT> *pathSmoothing;
+    QVector <Edge> *edge_arr;
     QVector <Edge> *checkEdge;
-
+    QMap<int, QPoint> indexes;
+    QMap<int, QPoint> indexes_smooth;
+    QVector <QVector<UT> > *vec_points;
+    QVector <QVector<Edge> > *vec_edge;
+    QVector <QVector<Edge> > *vec_edge_check;
+    QVector <QVector<UT> > *vec_pathSmooth;
+    QVector <QVector<UT> > *vec_path;
+    QVector <QVector<QPoint> > *vec_meshPoints;
+    QVector <double> lengthPath;
 };
 // возвращает true если внутри элипса
 inline bool isPointInsideElypseRLS(QVector<ZoneRLS> a_vecRLS, int px, int py) {
