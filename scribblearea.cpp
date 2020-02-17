@@ -62,18 +62,58 @@ QImage ScribbleArea::setPoints(QVector<QPoint> *points, int a_widthPen, QColor a
     return image;
 }
 
-QImage ScribbleArea::setLines(int a_widthPen, QColor a_color)
+QImage ScribbleArea::setLines(QVector<Edge> *edge_arr, QVector <UT> *a_points, int a_widthPen, QColor a_color)
 {
     QPainter painter(&image);
     painter.setPen(QPen(a_color, a_widthPen, Qt::SolidLine, Qt::RoundCap,
                         Qt::RoundJoin));
-    for(int i = 0; i < data->edge_arr->size(); i++) {
-        painter.drawLine(data->arr_points->at(data->edge_arr->at(i).a).x,
-                          data->arr_points->at(data->edge_arr->at(i).a).y,
-                          data->arr_points->at(data->edge_arr->at(i).b).x,
-                          data->arr_points->at(data->edge_arr->at(i).b).y);
+    for(int i = 0; i < edge_arr->size(); i++) {        
+        painter.drawLine(a_points->at(edge_arr->at(i).a).x,
+                          a_points->at(edge_arr->at(i).a).y,
+                          a_points->at(edge_arr->at(i).b).x,
+                          a_points->at(edge_arr->at(i).b).y);
     }
+    update();
+    return image;
+}
 
+
+
+QImage ScribbleArea::setLinesOnPoint(QVector<UT> *ut, int a_widthPen, QColor a_color)
+{
+    QPainter painter(&image);
+    painter.setPen(QPen(a_color, a_widthPen, Qt::SolidLine, Qt::RoundCap,
+                        Qt::RoundJoin));
+    for(int i = 0; i < ut->size() - 1; i++) {
+        painter.drawLine(ut->at(i).x,
+                          ut->at(i).y,
+                          ut->at(i + 1).x,
+                          ut->at(i + 1).y);
+    }
+    update();
+    return image;
+}
+
+QImage ScribbleArea::setLinesOnPointSmooth(QVector<UT> *ut, int a_widthPen, QColor a_color)
+{
+    if(ut->size() < 2) {
+        qDebug() << "setLinesOnPointSmooth array is empty";
+        return image;
+    }
+    QPainter painter(&image);
+    painter.setPen(QPen(a_color, a_widthPen, Qt::SolidLine, Qt::RoundCap,
+                        Qt::RoundJoin));
+    QPainterPath myPath;
+    myPath.moveTo(ut->at(0).x, ut->at(0).y);
+    for(int i = 1; i < ut->size() - 1 ; i+=2) {
+        double width = ut->at(i + 1).x - ut->at(i).x;
+        double height = ut->at(i + 1).y - ut->at(i).y;
+//        double length = sqrt(pow(width, 2.) + pow(height, 2.));
+        myPath.cubicTo(ut->at(i).x, ut->at(i).y,
+                       ut->at(i).x+(width/2.), ut->at(i).y+(height/2.),
+                       ut->at(i + 1).x, ut->at(i + 1).y);
+    }
+    painter.drawPath(myPath);
     update();
     return image;
 }

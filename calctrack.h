@@ -10,10 +10,11 @@
 class CalcTrack
 {
 public:
-    CalcTrack(Data *a_data, SIDE a_side);
-    void polosa();
+    CalcTrack(Data *a_data);
     QVector<QPoint> *getPoints();
+    void calcTrack();
 private:
+    int number_need_vert;
     double Ls;
     int min_x;
     int min_y;
@@ -21,8 +22,12 @@ private:
     int max_y;
     void calcMinMax();
     void setEdge();
+    void setEdgeOnPath();
     bool checkEdge(Edge ed);
-
+    QVector<double> calcPath(int number_vert);
+    QVector<double> smoothingPath();
+    QVector<int> *path;
+    QVector<Edge> *pathEdge;
     QVector <QPoint> *points;
     QVector <Edge> *edge_arr;
     QVector <UT> *arr_points;

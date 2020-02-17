@@ -39,16 +39,20 @@ MainWindow::MainWindow(QWidget *parent)
     this->setGeometry(0, 0, 1366, 600);
     // При отладке точки задать
 //    on_pushButton_clicked();
-    data->pointsFlightEnemy.append(QPoint(420, 273));
-    data->pointsFlightEnemy.append(QPoint(750, 234));
+    data->pointsFlightEnemy.append(QPoint(755, 214));
+    data->pointsFlightEnemy.append(QPoint(510, 253));
     for(int i = 0; i < 2; i++) {
         setPoint(data->pointsFlightEnemy[i].x(), data->pointsFlightEnemy[i].y());
     }
     on_pushButton_4_clicked();
 
-    CalcTrack track(data, ENEMY);
+    CalcTrack track(data);
     setPoints(track.getPoints());
-    setLines();
+    setLines(data->edge_arr, data->arr_points, 1, QColor(0, 0, 255));
+    setLinesOnPoint(data->path, 2, QColor(190, 100, 0));
+//    setLines(data->checkEdge, data->path, 1, QColor(100, 100, 100));
+//    setLinesOnPointSmooth(data->pathSmoothing, 2, QColor(255, 0, 0));
+    setLinesOnPoint(data->pathSmoothing, 2, QColor(255, 0, 0));
 }
 
 MainWindow::~MainWindow()
@@ -147,7 +151,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 
 void MainWindow::setPoint(int x, int y)
 {
-    data->image = scribbleArea->setPoint(QString::number(x) + ":" + QString::number(y), x, y);
+    data->image = scribbleArea->setPoint(QString::number(x) + ":" + QString::number(y), x, y, 3, QColor(0, 0, 255));
     scribbleArea->openImage(data->image);
     label->setPixmap(QPixmap::fromImage(data->image));
 
@@ -170,16 +174,40 @@ void MainWindow::generatePoint()
 
 void MainWindow::setPoints(QVector<QPoint> *points)
 {
-    scribbleArea->openImage(data->lastImage);
+    scribbleArea->openImage(data->image);
     data->image = scribbleArea->setPoints(points);
     scribbleArea->openImage(data->image);
     label->setPixmap(QPixmap::fromImage(data->image));
 }
 
-void MainWindow::setLines()
+void MainWindow::setLines(QVector<Edge> *edge, QVector <UT> *a_points, int size_widge, QColor a_color = QColor(0, 0, 255))
 {
-    scribbleArea->openImage(data->lastImage);
-    data->image = scribbleArea->setLines(1, QColor(0, 0, 255));
+    scribbleArea->openImage(data->image);
+    data->image = scribbleArea->setLines(edge, a_points, size_widge, a_color);
+    scribbleArea->openImage(data->image);
+    label->setPixmap(QPixmap::fromImage(data->image));
+}
+
+void MainWindow::setLinesOnPoint(QVector<UT> *ut, int size_widge, QColor a_color)
+{
+    if(ut->isEmpty()) {
+        qDebug() << "path not faund";
+        return;
+    }
+    scribbleArea->openImage(data->image);
+    data->image = scribbleArea->setLinesOnPoint(ut, size_widge, a_color);
+    scribbleArea->openImage(data->image);
+    label->setPixmap(QPixmap::fromImage(data->image));
+}
+
+void MainWindow::setLinesOnPointSmooth(QVector<UT> *ut, int size_widge, QColor a_color)
+{
+    if(ut->isEmpty()) {
+        qDebug() << "path not faund";
+        return;
+    }
+    scribbleArea->openImage(data->image);
+    data->image = scribbleArea->setLinesOnPointSmooth(ut, size_widge, a_color);
     scribbleArea->openImage(data->image);
     label->setPixmap(QPixmap::fromImage(data->image));
 }

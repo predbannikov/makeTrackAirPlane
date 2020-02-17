@@ -8,7 +8,7 @@
 #include <QVector>
 #include "math.h"
 
-
+enum SEARCH_SIDE {RIGHT, LEFT};
 enum SIDE {ENEMY, RUSSIA};
 
 struct Edge {
@@ -55,9 +55,12 @@ struct Data {
     Airplane enemyAir;
     Airplane russiaAir;
     QVector <QVector<UT> > *mat;
-    QVector <UT> *arr_points;
+    QVector <UT> *arr_points;               // Массив координат по индексам (номера точек)
+    QVector <UT> *arr_points_check;         // Массив координат по для проверки
     QVector <Edge> *edge_arr;
-
+    QVector<UT> *path;
+    QVector<UT> *pathSmoothing;
+    QVector <Edge> *checkEdge;
 
 };
 // возвращает true если внутри элипса

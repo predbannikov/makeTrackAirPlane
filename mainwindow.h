@@ -44,7 +44,9 @@ private:
     void setPoint(int x, int y);
     void generatePoint();
     void setPoints(QVector <QPoint> *points);
-    void setLines();
+    void setLines(QVector<Edge> *edge, QVector <UT> *a_points, int size_widge, QColor a_color);
+    void setLinesOnPoint(QVector<UT> *ut, int size_widge, QColor a_color);
+    void setLinesOnPointSmooth(QVector<UT> *ut, int size_widge, QColor a_color);
 //    QImage sourceImg;
     QImage resultImg;
 //    QVector<ZoneRLS> vecZoneRLS;
