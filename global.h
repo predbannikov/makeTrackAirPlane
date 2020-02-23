@@ -8,8 +8,12 @@
 #include <QVector>
 #include "math.h"
 
+#define COUNT_IT  1
+
 enum SEARCH_SIDE {RIGHT, LEFT};
 enum SIDE {ENEMY, RUSSIA};
+
+
 
 struct Edge {
     int a, b;       // номера индексов рёбер
@@ -41,6 +45,11 @@ struct ZoneRLS {
     int x = 0;
     int y = 0;
     int radius = 1;
+};
+
+struct PathTrack {
+    double length;
+    QVector<UT> path;
 };
 
 struct Data {
@@ -78,6 +87,8 @@ struct Data {
     QVector <QVector<UT> > *vec_path;
     QVector <QVector<QPoint> > *vec_meshPoints;
     QVector <double> lengthPath;
+    QVector <PathTrack> path_short;
+
 };
 // возвращает true если внутри элипса
 inline bool isPointInsideElypseRLS(QVector<ZoneRLS> a_vecRLS, int px, int py) {

@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     data = new Data;
     initAirplanes();
 
+
     data->vec_points = new QVector <QVector<UT> >;
     data->vec_edge = new QVector <QVector<Edge> >;
     data->vec_path = new QVector <QVector<UT> >;
@@ -45,20 +46,27 @@ MainWindow::MainWindow(QWidget *parent)
 
     loadDivision();
     this->setGeometry(0, 0, 1366, 600);
+
+    ZoneRLS rls = {500, 300, 50};
+//    data->zoneRLSEnemy.append(rls);
+
     // При отладке точки задать
 //    on_pushButton_clicked();
-    data->pointsFlightEnemy.append(QPoint(410, 253));
-    data->pointsFlightEnemy.append(QPoint(755, 214));
-    for(int i = 0; i < 2; i++) {
+    data->pointsFlightEnemy.append(QPoint(570, 294));
+    data->pointsFlightEnemy.append(QPoint(790, 250));
+    data->pointsFlightEnemy.append(QPoint(550, 414));
+    for(int i = 0; i < data->pointsFlightEnemy.size(); i++) {
         setPoint(data->pointsFlightEnemy[i].x(), data->pointsFlightEnemy[i].y());
     }
     on_pushButton_4_clicked();
 
-    CalcTrack track(data);
-    track.calcTrack(ENEMY, RIGHT);
+    track = new CalcTrack(data);
+    QObject::connect(track, &CalcTrack::drawLine, this, &MainWindow::drawLine);
+    QObject::connect(track, &CalcTrack::drawPoint, this, &MainWindow::drawPoint);
+    track->calcTrack(ENEMY, RIGHT);
     for(int i = 0; i < data->vec_meshPoints->size(); i++) {                                // Точки самой первой сетки
         QVector <QPoint> vec = data->vec_meshPoints->at(i);
-        setPoints(&vec);
+//        setPoints(&vec);
     }
 
     for(int i = 0; i < data->vec_edge->size(); i++) {                                // Лини самой первой сетки
@@ -67,17 +75,31 @@ MainWindow::MainWindow(QWidget *parent)
         setLines(&vec, &vec_points, 1, QColor(0, 0, 255));
     }
 
-    for(int i = 0; i < data->vec_edge_check->size(); i++) {                                // Все пути в сетке
-        QVector<Edge> vec = data->vec_edge_check->at(i);
-        QVector<UT> vec_ut = data->vec_path->at(i);
-        setLines(&vec, &vec_ut, 2, QColor(190, 100, 0));
+    for(int i = 0; i < data->vec_path->size(); i++) {
+        QVector<UT> vec = data->vec_path->at(i);
+//        setLinesOnPoint(&vec, 2, QColor(190, 100, 50));
     }
 
-    for(int i = 0; i < data->vec_pathSmooth->size(); i++) {                 // Сглаженный путь
-        qDebug() << "path" << i << "=" << data->lengthPath.at(i);
-        QVector<UT> vec = data->vec_pathSmooth->at(i);
-        setLinesOnPoint(&vec, 2, QColor(255, 0, 0));
+//    for(int i = 0; i < data->vec_edge_check->size(); i++) {                                // Все пути в сетке
+//        QVector<Edge> vec = data->vec_edge_check->at(i);
+//        QVector<UT> vec_ut = data->vec_path->at(i);
+//        setLines(&vec, &vec_ut, 2, QColor(190, 100, 0));
+//    }
+
+//    for(int i = 0; i < data->path_short.size(); i++) {                 // Сглаженный путь
+////        qDebug() << "path" << i << "=" << data->lengthPath.at(i);
+//        PathTrack track = data->path_short.at(i);
+//        if(i == getMinimumLength())
+//            setLinesOnPoint(&track.path, 3, QColor(200, 0, 0));
+//        else
+//            setLinesOnPoint(&track.path, 2, QColor(255, 0, 0));
+//    }
+    for(int i = 0; i < data->path_short.size(); i++) {                 // Сглаженный путь
+//        qDebug() << "path" << i << "=" << data->path_short.at(i).length;
+        QVector<UT> vec = data->path_short.at(i).path;
+//        setLinesOnPoint(&vec, 2, QColor(0, 190, 0));
     }
+    //****************************************************
 //        setPoints(track.getPoints());
 //        setLines(data->edge_arr, data->arr_points, 1, QColor(0, 0, 255));
 //        setLinesOnPoint(data->path, 2, QColor(190, 100, 0));
@@ -130,6 +152,19 @@ void MainWindow::updateLabelInfo()
                                    "Враг: модель %4, скорость %5 км/ч, радиус поворота %6 м")
                            .arg(data->russiaAir.model).arg(data->russiaAir.speed).arg(data->russiaAir.radiusTurn)
                            .arg(data->enemyAir.model).arg(data->enemyAir.speed).arg(data->enemyAir.radiusTurn));
+}
+
+int MainWindow::getMinimumLength()
+{
+    if(data->lengthPath.isEmpty())
+        return -1;
+    double minPath = data->lengthPath[0];
+    int index = 0;
+    for(int i = 0; i < data->lengthPath.size(); i++) {
+        if(minPath > data->lengthPath.at(i))
+            index = i;
+    }
+    return index;
 }
 
 QVector<QPoint> MainWindow::loadArrBorder(QString a_fileName)
@@ -208,7 +243,7 @@ void MainWindow::generatePoint()
 void MainWindow::setPoints(QVector<QPoint> *points)
 {
     scribbleArea->openImage(data->image);
-    data->image = scribbleArea->setPoints(points);
+    data->image = scribbleArea->setPoints(points, 2, QColor(0, 0, 255));
     scribbleArea->openImage(data->image);
     label->setPixmap(QPixmap::fromImage(data->image));
 }
@@ -217,6 +252,26 @@ void MainWindow::setLines(QVector<Edge> *edge, QVector <UT> *a_points, int size_
 {
     scribbleArea->openImage(data->image);
     data->image = scribbleArea->setLines(edge, a_points, size_widge, a_color);
+    scribbleArea->openImage(data->image);
+    label->setPixmap(QPixmap::fromImage(data->image));
+}
+
+void MainWindow::drawLine(UT p1, UT p2, int width, QColor col, QString str)
+{
+    QVector<UT> ut;
+//    ut.append(UT{(double)p1.x(), (double)p1.y(), 1});
+//    ut.append(UT{(double)p2.x(), (double)p2.y(), 1});
+    ut.append(p1);
+    ut.append(p2);
+    scribbleArea->openImage(data->image);
+    data->image = scribbleArea->setLinesOnPoint(&ut, width, col, str);
+    scribbleArea->openImage(data->image);
+    label->setPixmap(QPixmap::fromImage(data->image));
+}
+
+void MainWindow::drawPoint(UT p1, int width, QColor col)
+{
+    data->image = scribbleArea->setPoint("", p1.x, p1.y, width, col);
     scribbleArea->openImage(data->image);
     label->setPixmap(QPixmap::fromImage(data->image));
 }

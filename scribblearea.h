@@ -78,7 +78,7 @@ public:
     QImage setPoint(QString a_str, int x, int y, int a_widthPen = 10, QColor a_color = QColor(0, 0, 255));
     QImage setPoints(QVector<QPoint> *points, int a_widthPen = 4, QColor a_color = QColor(0, 0, 255));
     QImage setLines(QVector<Edge> *arr_edge, QVector <UT> *a_points, int a_widthPen = 3, QColor a_color = QColor(0, 0, 255));
-    QImage setLinesOnPoint(QVector<UT> *ut, int a_widthPen = 3, QColor a_color = QColor(0, 0, 255));
+    QImage setLinesOnPoint(QVector<UT> *ut, int a_widthPen = 3, QColor a_color = QColor(0, 0, 255), QString str = "");
     QImage setLinesOnPointSmooth(QVector<UT> *ut, int a_widthPen = 3, QColor a_color = QColor(0, 0, 255));
 
     Coord *coord;

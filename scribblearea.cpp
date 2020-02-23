@@ -79,7 +79,7 @@ QImage ScribbleArea::setLines(QVector<Edge> *edge_arr, QVector <UT> *a_points, i
 
 
 
-QImage ScribbleArea::setLinesOnPoint(QVector<UT> *ut, int a_widthPen, QColor a_color)
+QImage ScribbleArea::setLinesOnPoint(QVector<UT> *ut, int a_widthPen, QColor a_color, QString str)
 {
     QPainter painter(&image);
     painter.setPen(QPen(a_color, a_widthPen, Qt::SolidLine, Qt::RoundCap,
@@ -89,6 +89,14 @@ QImage ScribbleArea::setLinesOnPoint(QVector<UT> *ut, int a_widthPen, QColor a_c
                           ut->at(i).y,
                           ut->at(i + 1).x,
                           ut->at(i + 1).y);
+    }
+    if(!str.isEmpty()) {
+        painter.setPen(QPen(QColor(0, 0, 255), a_widthPen, Qt::SolidLine, Qt::RoundCap,
+                            Qt::RoundJoin));
+        QFont font = painter.font();
+        font.setPixelSize(17);
+        painter.setFont(font);
+        painter.drawText(ut->last().x, ut->last().y,  str);
     }
     update();
     return image;

@@ -19,6 +19,8 @@ QT_END_NAMESPACE
 
 class ScribbleArea;
 
+
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -32,6 +34,7 @@ private:
     void loadDivision();
     void initAirplanes();
     void updateLabelInfo();
+    int getMinimumLength();
     ScribbleArea *scribbleArea;
     Ui::MainWindow *ui;
     QLabel *label;
@@ -51,9 +54,11 @@ private:
     QImage resultImg;
 //    QVector<ZoneRLS> vecZoneRLS;
     Data *data;
-
+    CalcTrack *track;
 public slots:
     void updatePix(QImage *img);
+    void drawLine(UT p1, UT p2, int width, QColor col = QColor(50, 50, 50), QString str = "");
+    void drawPoint(UT p1, int width, QColor col = QColor(50, 50, 50));
 
 
 private slots:

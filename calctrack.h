@@ -2,15 +2,17 @@
 #define CALCTRACK_H
 #include <QVector>
 #include <QDebug>
+#include <QObject>
 #include "global.h"
 
 
 
-
-class CalcTrack
+class CalcTrack : public QObject
 {
+    Q_OBJECT
 public:
-    CalcTrack(Data *a_data);
+    explicit CalcTrack(Data *a_data, QObject *parent = nullptr);
+    ~CalcTrack();
     QVector<QPoint> *getPoints();
     void calcTrack(SIDE a_side, SEARCH_SIDE a_search_side);
 private:
@@ -20,8 +22,11 @@ private:
     int min_y;
     int max_x;
     int max_y;
+    double sin_lastPath;
+    int card_point = 0;
     void edgeAppend(Edge ed);
     void calcMinMax();
+    int getMinimumLength();
     void setEdge();
     void setEdgeOnPath();
     bool checkEdge(Edge ed);
@@ -32,8 +37,12 @@ private:
 
     QVector <UT> mat_line;
     QVector <QVector<UT> > mat;
+    UT ut_p1_last;
+    UT ut_p2_last;
     Data *data;
     SIDE side;
+    SEARCH_SIDE search_side;
+    double getAngleLastEdge(QPointF a, QPointF b);
 //    double xn, yn, xk, yk;      // '-[Xn, Yn, Xk, Yk -координаты начала и конца маршрута
 //    bool prErr;                 // '-[Признак наличия ошибок в составе входных данных
 //                                // '-[для сообщения внешним программам
@@ -61,6 +70,9 @@ private:
 
 //    double geoCoordX(int n, int k);
 //    double geoCoordY(int n, int k);
+signals:
+    void drawLine(UT p1, UT p2, int width, QColor col, QString str = "");
+    void drawPoint(UT p1, int width, QColor col);
 };
 
 //class Dim(int 3);

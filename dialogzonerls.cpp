@@ -396,9 +396,9 @@ bool DialogZoneRLS::checkPointRLS(ZoneRLS a_rls)
             return false;
     } else {
         if(isPointInsidePolygon(pointBorder, a_rls.x, a_rls.y)) {
-            qDebug() << "this point within given territory ";
+//            qDebug() << "this point within given territory ";
         } else {
-            qDebug() << "this point not within given territory ";
+//            qDebug() << "this point not within given territory ";
             return false;
         }
         bool check = true;
@@ -408,10 +408,10 @@ bool DialogZoneRLS::checkPointRLS(ZoneRLS a_rls)
                                        this->data->lastPointsFlight.at(i).y()))
                 check = false;
         }
-        if(!check)
-            qDebug() << "this point  within given light points";
-        else
-            qDebug() << "this point not within given light points";
+//        if(!check){
+//            qDebug() << "this point  within given light points";
+//        else
+//            qDebug() << "this point not within given light points";
 
         return check;
     }
@@ -452,6 +452,8 @@ bool DialogZoneRLS::checkPointFlight(QPoint a_point)
 void DialogZoneRLS::testFunc()
 {
     autoGenerateRLS();
+    ZoneRLS rls = {700, 270, 50};
+    data->lastZoneRLS.append(rls);
     QTimer::singleShot(100, this, &DialogZoneRLS::acceptButton);
 }
 
